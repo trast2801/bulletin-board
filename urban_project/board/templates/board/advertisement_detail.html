@@ -3,6 +3,14 @@
 {% block content %}
     <h1>{{ advertisement.title }}</h1>
     <p>{{ advertisement.content }}</p>
-    <a href="{% url 'board:edit_advertisement' advertisement.pk %}">Edit</a>
+
+    {% if user.is_authenticated %}
+        <button onclick="location.href='{% url 'board:edit_advertisement' pk=advertisement.pk %}'">Редактировать</button>
+        <form method="post" action="{% url 'board:del_advertisement' pk=advertisement.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Вы уверены, что хотите удалитьэту рекламу?');">Удалить</button>
+        </form>
+    {% endif %}
+<!--    <a href="{% url 'board:edit_advertisement' advertisement.pk %}">Edit</a>-->
 
 {% endblock %}
