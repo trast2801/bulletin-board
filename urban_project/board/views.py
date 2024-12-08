@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from board.models import Advertisement
 from board.forms import AdvertisementForm, Tst
@@ -50,7 +52,7 @@ def advertisement_detail(request, pk):
 def add_advertisement(request):
     ''' добавление объявления'''
     if request.method == "POST":
-        form = AdvertisementForm(request.POST)
+        form = AdvertisementForm(request.POST, request.FILES)
         if form.is_valid():
             advertisement = form.save(commit=False)
             advertisement.author = request.user
@@ -69,20 +71,26 @@ def edit_advertisement(request, pk):
         form = AdvertisementForm(request.POST, request.FILES, instance=advertisement)
         if form.is_valid():
             form.instance.author = request.user
-            form.save()
             img_obj = form.instance
+            form.save()
+            #img_obj = form.instance
             return redirect('board:advertisement_detail', pk=img_obj.pk)
             # return redirect('board:advertisement_list')
     else:
         form = AdvertisementForm(instance=advertisement)
     return render(request, 'board/edit_advertisement.html', {'form': form, 'advertisement': advertisement})
 
+
 @login_required
 def del_advertisement(request, pk):
-    ''' удаоени записи'''
+
+
+    ''' удаление записи'''
     if request.method == "POST":
         advertisement = get_object_or_404(Advertisement, pk=pk)
+        file_path = advertisement.get_image_full_path()
+        print(f'что это - {file_path}')
         advertisement.delete()
+        os.remove(file_path)
         return redirect('board:advertisement_list')
     return redirect('board:advertisement_detail', pk=pk)
-

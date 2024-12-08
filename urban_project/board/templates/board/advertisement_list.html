@@ -3,18 +3,20 @@
 {% block content %}
 <h1>Объявления</h1>
 {% if user.is_authenticated %}
-    <a href="{% url 'board:add_advertisement' %}"><button>Добавить объявление</button></a>
+<a href="{% url 'board:add_advertisement' %}">
+    <button>Добавить объявление</button>
+</a>
 {% endif %}
 <ul>
-  {% for advertisement in advertisements %}
+    {% for advertisement in advertisements %}
     <li>
-      <a
-          href="{% url 'board:advertisement_detail' pk=advertisement.pk %}"> {{ advertisement.title }}>
+        <a
+                href="{% url 'board:advertisement_detail' pk=advertisement.pk %}"> {{ advertisement.title }}>
 
-      </a>
+        </a>
 
     </li>
-  {% endfor %}
+    {% endfor %}
 </ul>
 
 {% endblock %}
