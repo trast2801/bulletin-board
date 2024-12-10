@@ -56,6 +56,11 @@ def add_advertisement(request):
         if form.is_valid():
             advertisement = form.save(commit=False)
             advertisement.author = request.user
+            if not advertisement.image:
+                # Обрабатываем отсутствие файла, ставим заглушку
+                advertisement.image = 'advertisements/none.jpg'
+
+
             advertisement.save()
             return redirect('board:advertisement_list')
     else:
@@ -73,7 +78,7 @@ def edit_advertisement(request, pk):
             form.instance.author = request.user
             img_obj = form.instance
             form.save()
-            #img_obj = form.instance
+            # img_obj = form.instance
             return redirect('board:advertisement_detail', pk=img_obj.pk)
             # return redirect('board:advertisement_list')
     else:
@@ -83,8 +88,6 @@ def edit_advertisement(request, pk):
 
 @login_required
 def del_advertisement(request, pk):
-
-
     ''' удаление записи'''
     if request.method == "POST":
         advertisement = get_object_or_404(Advertisement, pk=pk)

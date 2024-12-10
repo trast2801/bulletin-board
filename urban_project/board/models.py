@@ -8,7 +8,7 @@ class Advertisement(models.Model):
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to='advertisements/', null=True, blank=True)
+    image = models.ImageField(upload_to='advertisements', null=True, blank=True)
 
     def get_image_path(self):
         return self.image.path

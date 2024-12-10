@@ -3,8 +3,14 @@
 {% block content %}
 <h1>{{ advertisement.title }}</h1>
 <p>{{ advertisement.content }}</p>
-<!--<h3><img src="{{ advertisement.image.url }}"></h3>-->
-<img src="{{ advertisement.image.path }}"></h3>
+<style>
+        img {
+            width: 200px; /* Укажите нужную ширину */
+            height: auto; /* Сохраняет пропорции изображения */
+        }
+    </style>
+<h3><img src="{{ advertisement.image.url }}"></h3>
+<!--<img src="{{ advertisement.image.path }}"></h3>-->
 {% if user.is_authenticated %}
 <button onclick="location.href='{% url 'board:edit_advertisement' pk=advertisement.pk %}'">Редактировать</button>
 <form method="post" action="{% url 'board:del_advertisement' pk=advertisement.pk %}" style="display:inline;">
