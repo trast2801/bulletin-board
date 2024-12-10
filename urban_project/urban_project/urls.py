@@ -14,16 +14,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from board import views as board_views
+import debug_toolbar
+from urban_project import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('board/', include('board.urls', namespace='board')),
-    path('accounts/logout/', board_views.logout_view, name='logout'),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('', board_views.home, name='home'),
-    path('signup/', board_views.signup, name='signup'),
+                  path('admin/', admin.site.urls),
+                  path('board/', include('board.urls', namespace='board')),
+                  path('accounts/logout/', board_views.logout_view, name='logout'),
+                  path('accounts/', include('django.contrib.auth.urls')),
+                  path('', board_views.home, name='home'),
+                  path('signup/', board_views.signup, name='signup'),
 
-]
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
