@@ -88,12 +88,16 @@ def edit_advertisement(request, pk):
 
 @login_required
 def del_advertisement(request, pk):
-    ''' удаление записи'''
+    ''' удаление записи, при удалении записис сохраняет файл заглушку'''
     if request.method == "POST":
         advertisement = get_object_or_404(Advertisement, pk=pk)
         file_path = advertisement.get_image_full_path()
-        print(f'что это - {file_path}')
-        advertisement.delete()
-        os.remove(file_path)
+        file_name = str(advertisement.get_image_name())
+        if 'none.jpg' not in file_name  :
+            advertisement.delete()
+            os.remove(file_path)
+        else:
+            advertisement.delete()
         return redirect('board:advertisement_list')
+
     return redirect('board:advertisement_detail', pk=pk)
