@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ advertisement.title }}</h1>
-<p>{{ advertisement.content }}</p>
+<h1>Тема: {{ advertisement.title }}</h1>
+<h2>Автор: {{ advertisement.author }}</h2>
+<p> Содержимое: {{ advertisement.content }}</p>
+
 <style>
         img {
             width: 200px; /* Укажите нужную ширину */
@@ -10,13 +12,13 @@
         }
     </style>
 <h3><img src="{{ advertisement.image.url }}"></h3>
-<!--<img src="{{ advertisement.image.path }}"></h3>-->
+
 {% if user.is_authenticated %}
-<button onclick="location.href='{% url 'board:edit_advertisement' pk=advertisement.pk %}'">Редактировать</button>
-<form method="post" action="{% url 'board:del_advertisement' pk=advertisement.pk %}" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" onclick="return confirm('Вы уверены, что хотите удалитьэту рекламу?');">Удалить</button>
-</form>
+    <button onclick="location.href='{% url 'board:edit_advertisement' pk=advertisement.pk %}'">Редактировать</button>
+    <form method="post" action="{% url 'board:del_advertisement' pk=advertisement.pk %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" onclick="return confirm('Вы уверены, что хотите удалитьэту рекламу?');">Удалить</button>
+    </form>
 {% endif %}
 <!--    <a href="{% url 'board:edit_advertisement' advertisement.pk %}">Edit</a>-->
 

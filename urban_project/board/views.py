@@ -60,7 +60,6 @@ def add_advertisement(request):
                 # Обрабатываем отсутствие файла, ставим заглушку
                 advertisement.image = 'advertisements/none.jpg'
 
-
             advertisement.save()
             return redirect('board:advertisement_list')
     else:
@@ -89,11 +88,14 @@ def edit_advertisement(request, pk):
 @login_required
 def del_advertisement(request, pk):
     ''' удаление записи, при удалении записис сохраняет файл заглушку'''
+    advertisement = get_object_or_404(Advertisement, pk=pk)
+    if request.user != advertisement.author:
+        return redirect('board:advertisement_list')  #  если пользователь не является автором
     if request.method == "POST":
-        advertisement = get_object_or_404(Advertisement, pk=pk)
+
         file_path = advertisement.get_image_full_path()
         file_name = str(advertisement.get_image_name())
-        if 'none.jpg' not in file_name  :
+        if 'none.jpg' not in file_name:
             advertisement.delete()
             os.remove(file_path)
         else:
