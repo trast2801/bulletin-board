@@ -1,10 +1,13 @@
 import os
 
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from board.models import Advertisement
 from board.forms import AdvertisementForm, Tst
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.urls import reverse_lazy
+from django.views import View
 
 
 def logout_view(request):
@@ -77,6 +80,10 @@ def edit_advertisement(request, pk):
             form.instance.author = request.user
             img_obj = form.instance
             form.save()
+            # # Голосование
+            # action = request.POST.get('action')  # 'up' or 'down'
+            # advertisement.votes(request.user,action)
+            # advertisement.save()
             # img_obj = form.instance
             return redirect('board:advertisement_detail', pk=img_obj.pk)
             # return redirect('board:advertisement_list')
@@ -84,6 +91,18 @@ def edit_advertisement(request, pk):
         form = AdvertisementForm(instance=advertisement)
     return render(request, 'board/edit_advertisement.html', {'form': form, 'advertisement': advertisement})
 
+
+def vote_advertisement(request, post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Advertisement, id=post_id)
+        # Проверка, залогинен ли пользователь
+        # Голосование
+        action = request.POST.get('action')  # 'up' or 'down'
+        post.vote(request.user, action)
+        post.save()
+        return redirect('board/advertisement_list_old.html', pk=post.id)
+
+    return HttpResponseBadRequest()
 
 @login_required
 def del_advertisement(request, pk):
@@ -103,3 +122,18 @@ def del_advertisement(request, pk):
         return redirect('board:advertisement_list')
 
     return redirect('board:advertisement_detail', pk=pk)
+
+
+class VoteView(View):
+    def post(self, request, advertisement_id, action):
+        advertisement = get_object_or_404(Advertisement, pk=advertisement_id)
+        if action == 'up':
+            advertisement.votes.up (advertisement_id)
+        elif action == 'down':
+            advertisement.votes.down(advertisement_id)
+        else:
+            #return HttpResponseRedirect(reverse_lazy('vote'))
+            return redirect('board:advertisement_list')
+
+        #return HttpResponseRedirect(reverse_lazy('vote'))
+        return  redirect('board:advertisement_list')
