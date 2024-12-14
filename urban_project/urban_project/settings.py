@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'board',
     'debug_toolbar',
+    'vote',
 ]
 
 MIDDLEWARE = [

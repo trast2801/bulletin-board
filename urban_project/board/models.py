@@ -1,14 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import User
+from vote.managers import VotableManager
+from vote.models import VoteModel
 
 
-class Advertisement(models.Model):
+
+
+class Advertisement( VoteModel):
     '''описание модели таблицы  аdvertisement'''
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='advertisements', null=True, blank=True)
+    objects = VotableManager()
 
     def get_image_path(self):
         return self.image.path

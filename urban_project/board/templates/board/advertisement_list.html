@@ -1,25 +1,35 @@
 {% extends 'base.html' %}
-
+{% load vote %}
 {% block content %}
+
 <h1>Объявления</h1>
 {% if user.is_authenticated %}
 <a href="{% url 'board:add_advertisement' %}">
     <button>Добавить объявление</button>
 </a>
 {% endif %}
-<ul>
+
+<!-- announcement_list.html -->
+<div class="advertisements">
     {% for advertisement in advertisements %}
-    <li>
-        <a
-                href="{% url 'board:advertisement_detail' pk=advertisement.pk %}">
-                <h3> Автор  рекламы: {{advertisement.author.username}}</h3> Тема объявления: {{ advertisement.title }}
+        <div class="advertisement">
+            <!-- Ссылка на редактирование -->
+            <a href="{% url 'board:advertisement_detail' pk=advertisement.pk %}" class="advertisement-title">
+                ТЕМА обьявления: {{ advertisement.title }} ! АВТОР: {{advertisement.author}} ! like: {{advertisement.num_vote_up}} dislike {{advertisement.num_vote_down}}
+            </a>
 
-        </a>
-
-
-
-    </li>
+            <!-- Формы для лайка/дизлайка -->
+            <form action="{% url 'board:vote' advertisement.id 'up' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ advertisement.id }}" />
+                <button type="submit" class="btn-like">👍</button>
+            </form>
+            <form action="{% url 'board:vote' advertisement.id 'down' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ advertisement.id }}" />
+                <button type="submit" class="btn-dislike">👎</button>
+            </form>
+        </div>
     {% endfor %}
-</ul>
-
+</div>
 {% endblock %}
