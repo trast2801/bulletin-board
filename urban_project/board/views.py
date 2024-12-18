@@ -93,6 +93,7 @@ def edit_advertisement(request, pk):
 
 
 def vote_advertisement(request, post_id):
+    ''' функция голосования пользователя и записывает в БД результат'''
     if request.method == 'POST':
         post = get_object_or_404(Advertisement, id=post_id)
         # Проверка, залогинен ли пользователь
@@ -104,12 +105,13 @@ def vote_advertisement(request, post_id):
 
     return HttpResponseBadRequest()
 
+
 @login_required
 def del_advertisement(request, pk):
     ''' удаление записи, при удалении записис сохраняет файл заглушку'''
     advertisement = get_object_or_404(Advertisement, pk=pk)
     if request.user != advertisement.author:
-        return redirect('board:advertisement_list')  #  если пользователь не является автором
+        return redirect('board:advertisement_list')  # если пользователь не является автором
     if request.method == "POST":
 
         file_path = advertisement.get_image_full_path()
@@ -125,15 +127,14 @@ def del_advertisement(request, pk):
 
 
 class VoteView(View):
+    ''' класс, содержит метод, который отрабатывает голосование и возвращает результат голосования в форму'''
+
     def post(self, request, advertisement_id, action):
         advertisement = get_object_or_404(Advertisement, pk=advertisement_id)
         if action == 'up':
-            advertisement.votes.up (advertisement_id)
+            advertisement.votes.up(advertisement_id)
         elif action == 'down':
             advertisement.votes.down(advertisement_id)
         else:
-            #return HttpResponseRedirect(reverse_lazy('vote'))
             return redirect('board:advertisement_list')
-
-        #return HttpResponseRedirect(reverse_lazy('vote'))
-        return  redirect('board:advertisement_list')
+        return redirect('board:advertisement_list')
