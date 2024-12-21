@@ -11,7 +11,7 @@ urlpatterns = [
     path('add/', views.add_advertisement, name='add_advertisement'),
     path('edit/<int:pk>/', views.edit_advertisement, name='edit_advertisement'),
     path('delete/<int:pk>/', views.del_advertisement, name='del_advertisement'),
-    # path('delete/<int:pk>/', views.vote_advertisement, name='vote_advertisement'),
     path('vote/<int:advertisement_id>/<str:action>/', VoteView.as_view(), name='vote'),
+
 
 ]

@@ -7,7 +7,10 @@ from vote.models import VoteModel
 
 
 class Advertisement( VoteModel):
-    '''описание модели таблицы  аdvertisement'''
+    '''
+       описание модели таблицы  аdvertisement,
+       Подключена библиотека django_vote для оценки рекламмных сообщений
+    '''
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -40,3 +43,12 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'Comment by {self.author} on {self.advertisement}'
+
+class Stat(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    advertisement_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        """Возвращает строковое представление профиля пользователя."""
+        return self.user.username

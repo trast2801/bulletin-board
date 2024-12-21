@@ -1,13 +1,17 @@
 import os
 
+from django.contrib.auth.models import User
+from django.db.models import Count, Sum, Q
+from django.db.models.query import RawQuerySet
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
-from board.models import Advertisement
-from board.forms import AdvertisementForm, Tst
+from .models import Advertisement, Stat, Comment
+from .forms import AdvertisementForm, Tst
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.urls import reverse_lazy
 from django.views import View
+from .signals import *
 
 
 def logout_view(request):
@@ -41,7 +45,7 @@ def home(request):
 def advertisement_list(request):
     ''' вывод из БД списа объявлений'''
     advertisements = Advertisement.objects.all()
-
+    all = Advertisement.votes.count()
     return render(request, 'board/advertisement_list.html', {'advertisements': advertisements})
 
 
@@ -54,6 +58,8 @@ def advertisement_detail(request, pk):
 @login_required
 def add_advertisement(request):
     ''' добавление объявления'''
+
+    global user_id
     if request.method == "POST":
         form = AdvertisementForm(request.POST, request.FILES)
         if form.is_valid():
@@ -64,6 +70,9 @@ def add_advertisement(request):
                 advertisement.image = 'advertisements/none.jpg'
 
             advertisement.save()
+            # update_advertisement_count(sender=Advertisement, instance=advertisement, created=True)
+            print(advertisement.votes.all(user_id), " - ", len(advertisement.votes.all(user_id)),
+                  advertisement.votes.count())
             return redirect('board:advertisement_list')
     else:
         form = AdvertisementForm()
@@ -80,13 +89,7 @@ def edit_advertisement(request, pk):
             form.instance.author = request.user
             img_obj = form.instance
             form.save()
-            # # Голосование
-            # action = request.POST.get('action')  # 'up' or 'down'
-            # advertisement.votes(request.user,action)
-            # advertisement.save()
-            # img_obj = form.instance
             return redirect('board:advertisement_detail', pk=img_obj.pk)
-            # return redirect('board:advertisement_list')
     else:
         form = AdvertisementForm(instance=advertisement)
     return render(request, 'board/edit_advertisement.html', {'form': form, 'advertisement': advertisement})
@@ -121,9 +124,27 @@ def del_advertisement(request, pk):
             os.remove(file_path)
         else:
             advertisement.delete()
+
         return redirect('board:advertisement_list')
 
     return redirect('board:advertisement_detail', pk=pk)
+
+@login_required
+def stat_advertisement(request):
+    ''' вывод статистики по каждому пользователю в разрезе имя, сколько постов, сколько лайков дизлайков '''
+    author_stats = get_author_stats()
+    context = {"author_stats": author_stats}
+    return render(request, 'stat_advertisement.html', context)
+
+def get_author_stats():
+    # # Получаем статистику по каждому автору
+    queryset = (Advertisement.objects.values('author_id__username').
+                annotate(Count('author_id'), Sum('num_vote_up'), Sum('num_vote_down'),Sum('vote_score') ))
+
+    return list(queryset)
+
+
+
 
 
 class VoteView(View):

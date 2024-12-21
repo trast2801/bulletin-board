@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+{% if user.is_authenticated %}
+
+{% for advertisement in author_stats %}
+    <h1>
+        <br>
+            Пользователь = {{ advertisement.author_id__username }}
+        </br>
+    </h1>
+           всего сообщений = {{ advertisement.author_id__count}}
+           итого общая сумма откликов  = {{ advertisement.vote_score__sum  }}!
+           из них лайк =  {{ advertisement.num_vote_up__sum }}!
+           дизлайк  = {{advertisement.num_vote_down__sum  }}!
+
+{% endfor %}
+
+{% endif %}
+{% endblock content %}
