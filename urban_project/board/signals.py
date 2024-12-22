@@ -21,7 +21,7 @@ def update_advertisement_count_add(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Advertisement)
 def update_advertisement_count_del(sender, instance, **kwargs):
     """
-    Сигнал для обновления количества созданных объявлений. C защитой от минусов
+    Сигнал для обновления количества удаленных объявлений. C защитой от минусов
     """
     profile, _ = Stat.objects.get_or_create(user=instance.author)
     if profile.advertisement_count > 0:

@@ -71,8 +71,7 @@ def add_advertisement(request):
 
             advertisement.save()
             # update_advertisement_count(sender=Advertisement, instance=advertisement, created=True)
-            print(advertisement.votes.all(user_id), " - ", len(advertisement.votes.all(user_id)),
-                  advertisement.votes.count())
+
             return redirect('board:advertisement_list')
     else:
         form = AdvertisementForm()
