@@ -1,6 +1,7 @@
 import os
 
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count, Sum, Q
 from django.db.models.query import RawQuerySet
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -44,9 +45,10 @@ def home(request):
 
 def advertisement_list(request):
     ''' вывод из БД списа объявлений'''
-    advertisements = Advertisement.objects.all()
+    # advertisements = Advertisement.objects.all()
     all = Advertisement.votes.count()
-    return render(request, 'board/advertisement_list.html', {'advertisements': advertisements})
+    advertisements = Advertisement.objects.all()
+    return render(request, 'board/advertisement_list.html', {'advertisements': advertisements}, )
 
 
 def advertisement_detail(request, pk):
@@ -158,3 +160,34 @@ class VoteView(View):
         else:
             return redirect('board:advertisement_list')
         return redirect('board:advertisement_list')
+
+def advertisement_list(request):
+    """
+    Отображение списка объявлений с пагинацией.
+
+    Args:
+        request (HttpRequest): Объект HTTP-запроса.
+
+    Returns:
+        HttpResponse: Отображение списка объявлений с пагинацией.
+    """
+    # Получаем все объявления
+    advertisements = Advertisement.objects.all().order_by('-created_at')
+
+    # Пагинация
+    paginator = Paginator(advertisements, 5)
+    page = request.GET.get('page')
+
+    try:
+        # Получаем объявления для текущей страницы
+        advertisements_page = paginator.page(page)
+    except PageNotAnInteger:
+        # Если page не является числом, показываем первую страницу
+        advertisements_page = paginator.page(1)
+    except EmptyPage:
+        # Если page находится за пределами диапазона, показываем последнюю страницу
+        advertisements_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'board/advertisement_list.html', {
+        'advertisements_page': advertisements_page,
+    })
