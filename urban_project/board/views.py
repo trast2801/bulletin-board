@@ -162,17 +162,11 @@ class VoteView(View):
         return redirect('board:advertisement_list')
 
 def advertisement_list(request):
-    """
+    '''
     Отображение списка объявлений с пагинацией.
-
-    Args:
-        request (HttpRequest): Объект HTTP-запроса.
-
-    Returns:
-        HttpResponse: Отображение списка объявлений с пагинацией.
-    """
+    '''
     # Получаем все объявления
-    advertisements = Advertisement.objects.all().order_by('-created_at')
+    advertisements = Advertisement.objects.all()
 
     # Пагинация
     paginator = Paginator(advertisements, 5)
@@ -188,6 +182,6 @@ def advertisement_list(request):
         # Если page находится за пределами диапазона, показываем последнюю страницу
         advertisements_page = paginator.page(paginator.num_pages)
 
-    return render(request, 'board/advertisement_list.html', {
-        'advertisements_page': advertisements_page,
+    return render(request, 'board/1_advertisement_list.html', {
+        'advertisements_page': advertisements_page
     })
